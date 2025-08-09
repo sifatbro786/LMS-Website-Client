@@ -9,12 +9,6 @@ const Loader = () => {
                 <div className="circle" />
                 <div className="circle" />
             </div>
-            <div className="loading-text">
-                Loading
-                <span className="dots" aria-hidden="true">
-                    ...
-                </span>
-            </div>
         </div>
     );
 };

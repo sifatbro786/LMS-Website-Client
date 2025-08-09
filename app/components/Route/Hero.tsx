@@ -2,10 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { FC } from "react";
 
-import HeroImage from "../../assets/banner-img-1.png";
-import Client1 from "../../assets/client-1.jpg";
-import Client2 from "../../assets/client-2.jpg";
-import Client3 from "../../assets/client-3.jpg";
+import HeroImage from "../../../public/assets/banner-img-1.png";
+import Client1 from "../../../public/assets/client-1.jpg";
+import Client2 from "../../../public/assets/client-2.jpg";
+import Client3 from "../../../public/assets/client-3.jpg";
 
 const HeroSection: FC = () => {
     return (

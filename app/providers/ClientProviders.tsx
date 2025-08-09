@@ -9,24 +9,24 @@ import Loader from "../components/loader/Loader";
 import { useLoadUserQuery } from "../../redux/features/api/apiSlice";
 
 type Props = {
-  children: ReactNode;
+    children: ReactNode;
 };
 
 export default function ClientProviders({ children }: Props) {
-  return (
-    <ReduxProvider>
-      <SessionProvider>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Custom>{children}</Custom>
-          <Toaster position="top-center" reverseOrder={false} />
-        </ThemeProvider>
-      </SessionProvider>
-    </ReduxProvider>
-  );
+    return (
+        <ReduxProvider>
+            <SessionProvider>
+                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                    <Custom>{children}</Custom>
+                    <Toaster position="top-center" reverseOrder={false} />
+                </ThemeProvider>
+            </SessionProvider>
+        </ReduxProvider>
+    );
 }
 
 const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isLoading } = useLoadUserQuery();
+    const { isLoading } = useLoadUserQuery();
 
-  return <>{isLoading ? <Loader /> : children}</>;
+    return <>{isLoading ? <Loader /> : children}</>;
 };

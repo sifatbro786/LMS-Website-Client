@@ -1,4 +1,3 @@
-// components/Layout/Header.tsx
 "use client";
 
 import Link from "next/link";
@@ -14,9 +13,8 @@ import { useSelector } from "react-redux";
 import Image from "next/image";
 import AvatarImage from "../../public/avatar.png";
 import { useSession } from "next-auth/react";
-import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
+import { useLogOutQuery, useSocialAuthMutation } from "../../redux/features/auth/authApi";
 import toast from "react-hot-toast";
-import { usePrevious } from "../utils/usePrevious";
 
 type HeaderProps = {
     open: boolean;
@@ -33,71 +31,49 @@ const Header: FC<HeaderProps> = ({ open, setOpen, activeItem, setRoute, route })
 
     const [active, setActive] = useState(false);
     const [openSidebar, setOpenSidebar] = useState(false);
+    const [logout, setLogout] = useState(false);
+    const {} = useLogOutQuery(undefined, {
+        skip: !logout ? true : false,
+    });
 
-    const prevUser = usePrevious(user);
-    const prevIsSuccess = usePrevious(isSuccess);
-
-    // Scroll effect
+    //! Social auth / toast logic
     useEffect(() => {
-        const handleScroll = () => {
+        if (!user) {
+            if (data) {
+                socialAuth({
+                    email: data?.user?.email,
+                    name: data?.user?.name,
+                    avatar: data?.user?.image,
+                });
+            }
+        }
+        if (data === null) {
+            if (isSuccess) {
+                toast.success("Login successful.");
+            }
+        }
+
+        if (data === null) {
+            setLogout(true);
+        }
+    }, [data, user, socialAuth, isSuccess, error]);
+
+    //! Scroll effect
+    if (typeof window !== "undefined") {
+        window.addEventListener("scroll", () => {
             if (window.scrollY > 85) {
                 setActive(true);
             } else {
                 setActive(false);
             }
-        };
-
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
-
-    // Social auth / toast logic
-    useEffect(() => {
-        // Reset toast gating on logout
-        if (prevUser && !user) {
-            sessionStorage.removeItem("socialLoginToastShown");
-        }
-
-        // Trigger social auth if session exists but no user in store
-        if (!user && data) {
-            socialAuth({
-                email: data.user?.email,
-                name: data.user?.name,
-                avatar: data.user?.image,
-            });
-        }
-
-        // Success toast: only when isSuccess transitions from false->true AND not already shown in this session
-        const alreadyShown = sessionStorage.getItem("socialLoginToastShown");
-        if (isSuccess && !prevIsSuccess && !alreadyShown) {
-            toast.success("Login successful!");
-            sessionStorage.setItem("socialLoginToastShown", "1");
-        }
-
-        // Error handling
-        if (error) {
-            if (typeof error === "object" && "data" in error && (error as any).data?.message) {
-                toast.error((error as any).data.message);
-            } else {
-                toast.error("Something went wrong.");
-                console.error(error);
-            }
-        }
-    }, [data, user, socialAuth, isSuccess, error, prevUser, prevIsSuccess]);
+        });
+    }
 
     const handleClose = (e: React.MouseEvent<HTMLDivElement>) => {
         if ((e.target as HTMLDivElement).id === "screen") {
             setOpenSidebar(false);
         }
     };
-
-    // TODO:
-    // const handleLogout = () => {
-    //     // your logout logic: clear auth slice, session, etc.
-    //     dispatch(logoutAction());
-    //     // optionally clear sessionStorage gating so next login shows toast
-    //     sessionStorage.removeItem("socialLoginToastShown");
-    // };
 
     return (
         <div className="w-full relative">
@@ -133,11 +109,14 @@ const Header: FC<HeaderProps> = ({ open, setOpen, activeItem, setRoute, route })
                             {user ? (
                                 <Link href="/profile">
                                     <Image
-                                        src={user?.avatar?.url || AvatarImage}
+                                        src={user?.avatar ? user?.avatar?.url : AvatarImage}
                                         alt={user.name || "avatar"}
                                         width={30}
                                         height={30}
                                         className="w-[32px] h-[32px] rounded-full cursor-pointer object-cover"
+                                        style={{
+                                            border: activeItem === 5 ? "2px solid #37a39a" : "none",
+                                        }}
                                     />
                                 </Link>
                             ) : (

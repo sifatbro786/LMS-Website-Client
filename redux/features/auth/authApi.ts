@@ -1,5 +1,5 @@
 import { apiSlice } from "../api/apiSlice";
-import { userLoggedIn, userRegistration } from "./authSlice";
+import { userLoggedIn, userLoggedOut, userRegistration } from "./authSlice";
 
 type RegistrationResponse = {
     message: string;
@@ -9,7 +9,7 @@ type RegistrationData = {
     name: string;
     email: string;
     password: string;
-}
+};
 
 export const authApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
@@ -39,6 +39,7 @@ export const authApi = apiSlice.injectEndpoints({
                 url: "/activate-user",
                 method: "POST",
                 body: { activation_token, activation_code },
+                credentials: "include" as const,
             }),
         }),
         login: builder.mutation({
@@ -85,7 +86,28 @@ export const authApi = apiSlice.injectEndpoints({
                 }
             },
         }),
+        logOut: builder.query({
+            query: () => ({
+                url: "/logout",
+                method: "GET",
+                credentials: "include" as const,
+            }),
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+                try {
+                    dispatch(userLoggedOut());
+                } catch (err) {
+                    console.log(err);
+                }
+            },
+        }),
     }),
 });
 
-export const { useRegisterMutation, useActivationMutation, useLoginMutation, useSocialAuthMutation } = authApi;
+export const {
+    useRegisterMutation,
+    useActivationMutation,
+    useLoginMutation,
+    useSocialAuthMutation,
+    useLogOutQuery,
+} = authApi;
