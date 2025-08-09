@@ -101,7 +101,7 @@ const ProfileInfo: React.FC<Props> = ({ user, avatar }) => {
                     <div className="800px:w-[50%] m-auto block pb-4">
                         {/* //? Name */}
                         <div className="w-full">
-                            <label htmlFor="name" className="block">
+                            <label htmlFor="name" className="block dark:text-white text-black">
                                 Full Name
                             </label>
                             <input
@@ -116,7 +116,7 @@ const ProfileInfo: React.FC<Props> = ({ user, avatar }) => {
 
                         {/* //? Email */}
                         <div className="w-full pt-5">
-                            <label className="block">Email Address</label>
+                            <label className="block dark:text-white text-black">Email Address</label>
                             <input
                                 type="text"
                                 className={`${styles.input} !w-[95%] mb-1 800px:mb-0 cursor-not-allowed`}

@@ -4,6 +4,8 @@ import avatarDefault from "../../../public/avatar.png";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { SiCoursera } from "react-icons/si";
 import { AiOutlineLogout } from "react-icons/ai";
+import { MdOutlineAdminPanelSettings } from "react-icons/md";
+import Link from "next/link";
 
 type Props = {
     user: any;
@@ -61,13 +63,26 @@ const SidebarProfile: React.FC<Props> = ({ user, active, setActive, avatar, logo
                 </h5>
             </div>
 
-            {/* //? enrolled courses */}
+            {/* //? admin dashboard */}
+            {user?.role === "admin" && (
+                <Link
+                    href="/admin"
+                    className={`w-full flex items-center px-3 py-4 cursor-pointer`}
+                >
+                    <MdOutlineAdminPanelSettings size={20} className="dark:text-white text-black" />
+                    <h5 className="hidden 800px:block pl-2 font-Poppins text-black dark:text-white hover:underline">
+                        Admin Dashboard
+                    </h5>
+                </Link>
+            )}
+
+            {/* //? log out */}
             <div
                 className="w-full flex items-center px-3 py-4 cursor-pointer"
                 onClick={() => logoutHandler()}
             >
                 <AiOutlineLogout size={20} className="dark:text-white text-black" />
-                <h5 className="hidden 800px:block pl-2 font-Poppins text-black dark:text-white">
+                <h5 className="hidden 800px:block pl-2 font-Poppins text-black dark:text-white hover:underline">
                     Log Out
                 </h5>
             </div>

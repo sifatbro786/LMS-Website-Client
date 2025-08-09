@@ -21,7 +21,7 @@ const ProfilePage: React.FC = () => {
         <div>
             <Protected>
                 <Heading
-                    title={`${user?.name} | Profile`}
+                    title={`${user?.name} | Profile - ELearning`}
                     description="ELearning is a platform for students to learn and get help from teachers."
                     keywords="Programming, Learn, LMS, React, Redux, Graphic Design, MERN, Website, UI/UX"
                 />
