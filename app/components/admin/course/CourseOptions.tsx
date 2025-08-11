@@ -18,7 +18,7 @@ const CourseOptions: FC<props> = ({ active, setActive }) => {
                             active + 1 > index ? "bg-blue-500 " : "bg-[#384766]"
                         } relative`}
                     >
-                        <IoMdCheckmark className="text-[25px] text-black dark:text-white" />
+                        <IoMdCheckmark className="text-[25px] text-white" />
                         {index !== options.length - 1 && (
                             <div
                                 className={`absolute h-[30px] w-1 ${
@@ -28,10 +28,7 @@ const CourseOptions: FC<props> = ({ active, setActive }) => {
                         )}
                     </div>
                     <h5
-                        className={`pl-3 text-[20px] ${
-                            active === index && "text-black dark:text-white"
-                        }`}
-                    >
+                        className="pl-3 text-[20px] text-black dark:text-white">
                         {option}
                     </h5>
                 </div>

@@ -58,7 +58,7 @@ const CourseData: FC<Props> = ({
     };
 
     return (
-        <div className="w-[80%] m-auto h-screen pt-24 block">
+        <div className="w-[80%] m-auto min-h-[100vh] pt-24 block">
             {/* //? Benefits */}
             <div>
                 <label htmlFor="benefits" className={`${styles.label} text-[20px]`}>
@@ -79,6 +79,7 @@ const CourseData: FC<Props> = ({
                     />
                 ))}
                 <AddCircleIcon
+                    className="text-black dark:text-white"
                     style={{ margin: "10px 0px", width: "30px", cursor: "pointer" }}
                     onClick={handleAddBenefits}
                 />
@@ -104,6 +105,7 @@ const CourseData: FC<Props> = ({
                     />
                 ))}
                 <AddCircleIcon
+                    className="text-black dark:text-white"
                     style={{ margin: "10px 0px", width: "30px", cursor: "pointer" }}
                     onClick={handleAddPrerequisites}
                 />
@@ -124,6 +126,9 @@ const CourseData: FC<Props> = ({
                     Next
                 </div>
             </div>
+            <br />
+            <br />
+            <br />
         </div>
     );
 };
