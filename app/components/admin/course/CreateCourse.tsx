@@ -1,13 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CourseInformation from "./CourseInformation";
 import CourseOptions from "./CourseOptions";
 import CourseData from "./CourseData";
 import CourseContent from "./CourseContent";
 import CoursePreview from "./CoursePreview";
+import { useCreateCourseMutation } from "../../../../redux/features/courses/coursesApi";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const CreateCourse = () => {
+    const [createCourse, { isLoading, isSuccess, error }] = useCreateCourseMutation();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success("Course created successfully!");
+            router.push("/admin/all-courses");
+        }
+
+        if (error) {
+            if ("data" in error) {
+                const errMessage = error as any;
+                toast.error(errMessage.data.message);
+            }
+        }
+    }, [isSuccess, error, router, isLoading]);
+
     const [active, setActive] = useState(0);
     const [courseInfo, setCourseInfo] = useState({
         name: "",
@@ -73,11 +93,12 @@ const CreateCourse = () => {
         setCourseData(data);
     };
 
-    console.log(courseData);
-    
-
     const handleCourseCreate = async () => {
-        // const data = courseData
+        const data = courseData;
+
+        if (!isLoading) {
+            await createCourse(data);
+        }
     };
 
     return (

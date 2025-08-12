@@ -1,20 +1,21 @@
 "use client";
 
-import Heading from "../utils/Heading";
-import AdminSidebar from "../components/admin/sidebar/AdminSidebar";
-import AdminProtected from "../hooks/adminProtected";
-import DashboardHero from "../components/admin/DashboardHero";
+import AdminSidebar from "../../../app/components/admin/sidebar/AdminSidebar";
+import AdminProtected from "../../../app/hooks/adminProtected";
+import Heading from "../../../app/utils/Heading";
+import DashboardHero from "../../../app/components/admin/DashboardHero";
+import AllUsers from "../../../app/components/admin/user/AllUsers";
 
-const AdminPage = () => {
+const TeamsPage = () => {
     return (
         <div>
             <AdminProtected>
                 <Heading
-                    title="ELearning | Admin"
+                    title="ELearning | All Users"
                     description="ELearning is a platform for students to learn and get help from teachers."
                     keywords="Programming, Learn, LMS, React, Redux, Graphic Design, MERN, Website, UI/UX"
                 />
-                <div className="flex h-[200vh]">
+                <div className="flex min-h-screen">
                     {/* //? Sidebar */}
                     <div className="1500px:w-[16%] w-1/5">
                         <AdminSidebar />
@@ -23,10 +24,11 @@ const AdminPage = () => {
                     {/* //? Content */}
                     <div className="w-[85%]">
                         <DashboardHero />
+                        <AllUsers isTeam={true} />
                     </div>
                 </div>
             </AdminProtected>
         </div>
     );
 };
-export default AdminPage;
+export default TeamsPage;

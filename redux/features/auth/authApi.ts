@@ -5,10 +5,34 @@ type RegistrationResponse = {
     message: string;
     activationToken: string;
 };
+
 type RegistrationData = {
     name: string;
     email: string;
     password: string;
+};
+
+type LoginResponse = {
+    success: boolean;
+    accessToken: string;
+    user: any;
+    message: string;
+};
+
+type LoginData = {
+    email: string;
+    password: string;
+};
+
+type SocialAuthData = {
+    email: string;
+    name: string;
+    avatar?: string;
+};
+
+type ActivationData = {
+    activation_token: string;
+    activation_code: string;
 };
 
 export const authApi = apiSlice.injectEndpoints({
@@ -29,12 +53,13 @@ export const authApi = apiSlice.injectEndpoints({
                             token: result.data.activationToken,
                         }),
                     );
-                } catch (err) {
-                    console.log(err);
+                } catch (err: any) {
+                    console.error("Registration failed:", err);
                 }
             },
         }),
-        activation: builder.mutation({
+
+        activation: builder.mutation<{ success: boolean; message: string }, ActivationData>({
             query: ({ activation_token, activation_code }) => ({
                 url: "/activate-user",
                 method: "POST",
@@ -42,7 +67,8 @@ export const authApi = apiSlice.injectEndpoints({
                 credentials: "include" as const,
             }),
         }),
-        login: builder.mutation({
+
+        login: builder.mutation<LoginResponse, LoginData>({
             query: ({ email, password }) => ({
                 url: "/login",
                 method: "POST",
@@ -53,18 +79,25 @@ export const authApi = apiSlice.injectEndpoints({
                 try {
                     const result = await queryFulfilled;
 
-                    dispatch(
-                        userLoggedIn({
-                            accessToken: result.data.accessToken,
-                            user: result.data.user,
-                        }),
-                    );
-                } catch (err) {
-                    console.log(err);
+                    if (result.data.success && result.data.accessToken && result.data.user) {
+                        dispatch(
+                            userLoggedIn({
+                                accessToken: result.data.accessToken,
+                                user: result.data.user,
+                            }),
+                        );
+                    } else {
+                        console.warn("Login response missing required data:", result.data);
+                    }
+                } catch (err: any) {
+                    console.error("Login failed:", err);
+                    // Ensure user is logged out on login failure
+                    dispatch(userLoggedOut());
                 }
             },
         }),
-        socialAuth: builder.mutation({
+
+        socialAuth: builder.mutation<LoginResponse, SocialAuthData>({
             query: ({ email, name, avatar }) => ({
                 url: "/social-auth",
                 method: "POST",
@@ -75,29 +108,39 @@ export const authApi = apiSlice.injectEndpoints({
                 try {
                     const result = await queryFulfilled;
 
-                    dispatch(
-                        userLoggedIn({
-                            accessToken: result.data.accessToken,
-                            user: result.data.user,
-                        }),
-                    );
-                } catch (err) {
-                    console.log(err);
+                    if (result.data.success && result.data.accessToken && result.data.user) {
+                        dispatch(
+                            userLoggedIn({
+                                accessToken: result.data.accessToken,
+                                user: result.data.user,
+                            }),
+                        );
+                    } else {
+                        console.warn("Social auth response missing required data:", result.data);
+                    }
+                } catch (err: any) {
+                    console.error("Social authentication failed:", err);
+                    dispatch(userLoggedOut());
                 }
             },
         }),
-        logOut: builder.query({
+
+        logOut: builder.mutation<{ success: boolean; message: string }, void>({
             query: () => ({
                 url: "/logout",
                 method: "GET",
                 credentials: "include" as const,
             }),
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             async onQueryStarted(arg, { queryFulfilled, dispatch }) {
                 try {
+                    await queryFulfilled;
+                    // Always dispatch logout, regardless of server response
                     dispatch(userLoggedOut());
-                } catch (err) {
-                    console.log(err);
+                } catch (err: any) {
+                    console.error("Logout failed:", err);
+                    // Still dispatch logout even if server request fails
+                    // This ensures client state is cleared
+                    dispatch(userLoggedOut());
                 }
             },
         }),
@@ -109,5 +152,5 @@ export const {
     useActivationMutation,
     useLoginMutation,
     useSocialAuthMutation,
-    useLogOutQuery,
+    useLogOutMutation,
 } = authApi;

@@ -67,7 +67,9 @@ const AdminSidebar = () => {
         <Box
             sx={{
                 "& .pro-sidebar-inner": {
-                    background: `${theme === "dark" ? "#111c43 !important" : "#00000015 !important"}`,
+                    background: `${
+                        theme === "dark" ? "#111c43 !important" : "#00000015 !important"
+                    }`,
                 },
                 "& .pro-icon-wrapper": {
                     backgroundColor: "transparent !important",

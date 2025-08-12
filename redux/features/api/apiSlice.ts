@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { userLoggedIn } from "../auth/authSlice";
+import { userLoggedIn, userLoggedOut } from "../auth/authSlice";
 
 interface LoadUserResponse {
     accessToken: string;
@@ -23,6 +23,19 @@ export const apiSlice = createApi({
                 method: "GET",
                 credentials: "include" as const,
             }),
+            async onQueryStarted(_, { queryFulfilled, dispatch }) {
+                try {
+                    await queryFulfilled;
+                    // Don't dispatch anything here, let loadUser handle it
+                    console.log("Token refreshed successfully");
+                } catch (err: any) {
+                    console.log("Failed to refresh token:", err);
+                    // If refresh fails, user should be logged out
+                    if (err.error?.status === 400 || err.error?.status === 401) {
+                        dispatch(userLoggedOut());
+                    }
+                }
+            },
         }),
 
         loadUser: builder.query<LoadUserResponse, void>({
@@ -48,9 +61,14 @@ export const apiSlice = createApi({
                             "loadUser: missing accessToken or user in response",
                             result.data,
                         );
+                        dispatch(userLoggedOut());
                     }
-                } catch (err) {
+                } catch (err: any) {
                     console.error("Failed to load user:", err);
+                    // If loadUser fails, user should be logged out
+                    if (err.error?.status === 400 || err.error?.status === 401) {
+                        dispatch(userLoggedOut());
+                    }
                 }
             },
         }),

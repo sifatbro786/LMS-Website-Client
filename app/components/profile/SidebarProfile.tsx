@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import React from "react";
 import avatarDefault from "../../../public/avatar.png";
@@ -6,19 +8,53 @@ import { SiCoursera } from "react-icons/si";
 import { AiOutlineLogout } from "react-icons/ai";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import Link from "next/link";
+import { toast } from "react-hot-toast";
+import { useLogOutMutation } from "../../../redux/features/auth/authApi";
+import { useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
+import { useDispatch } from "react-redux";
+import { userLoggedOut } from "../../../redux/features/auth/authSlice";
 
 type Props = {
     user: any;
     active: number;
     setActive: (active: number) => void;
     avatar: string | null;
-    logoutHandler: () => void;
 };
 
-const SidebarProfile: React.FC<Props> = ({ user, active, setActive, avatar, logoutHandler }) => {
+const SidebarProfile: React.FC<Props> = ({ user, active, setActive, avatar }) => {
+    const [logOut, { isLoading }] = useLogOutMutation();
+    const router = useRouter();
+    const { data: session } = useSession();
+    const dispatch = useDispatch();
+
+    const handleLogout = async () => {
+        try {
+            if (session) {
+                // Social login → NextAuth sign out
+                await signOut({ redirect: false });
+                setTimeout(async () => {
+                    await signOut({ redirect: false }); // Call signOut again after a short delay
+                }, 3000); // Adjust the delay as needed
+                dispatch(userLoggedOut()); // Clear Redux/localStorage
+                toast.success("Logged out successfully");
+                router.push("/");
+            } else {
+                // Email/password → backend logout
+                await logOut().unwrap();
+                dispatch(userLoggedOut());
+                toast.success("Logged out successfully");
+                router.push("/");
+            }
+        } catch (error: any) {
+            console.error("Logout error:", error);
+            toast.error("Failed to log out");
+        }
+    };
+
     return (
         <div className="w-full">
-            {/* //? my account */}
+            {/* My account */}
             <div
                 className={`w-full flex items-center px-3 py-4 cursor-pointer ${
                     active === 1 ? "dark:bg-slate-800 bg-slate-200" : "bg-transparent"
@@ -37,7 +73,7 @@ const SidebarProfile: React.FC<Props> = ({ user, active, setActive, avatar, logo
                 </h5>
             </div>
 
-            {/* //? change password */}
+            {/* Change password */}
             <div
                 className={`w-full flex items-center px-3 py-4 cursor-pointer ${
                     active === 2 ? "dark:bg-slate-800 bg-slate-200" : "bg-transparent"
@@ -50,7 +86,7 @@ const SidebarProfile: React.FC<Props> = ({ user, active, setActive, avatar, logo
                 </h5>
             </div>
 
-            {/* //? enrolled courses */}
+            {/* Enrolled courses */}
             <div
                 className={`w-full flex items-center px-3 py-4 cursor-pointer ${
                     active === 3 ? "dark:bg-slate-800 bg-slate-200" : "bg-transparent"
@@ -63,12 +99,9 @@ const SidebarProfile: React.FC<Props> = ({ user, active, setActive, avatar, logo
                 </h5>
             </div>
 
-            {/* //? admin dashboard */}
+            {/* Admin dashboard */}
             {user?.role === "admin" && (
-                <Link
-                    href="/admin"
-                    className={`w-full flex items-center px-3 py-4 cursor-pointer`}
-                >
+                <Link href="/admin" className="w-full flex items-center px-3 py-4 cursor-pointer">
                     <MdOutlineAdminPanelSettings size={20} className="dark:text-white text-black" />
                     <h5 className="hidden 800px:block pl-2 font-Poppins text-black dark:text-white hover:underline">
                         Admin Dashboard
@@ -76,17 +109,18 @@ const SidebarProfile: React.FC<Props> = ({ user, active, setActive, avatar, logo
                 </Link>
             )}
 
-            {/* //? log out */}
+            {/* Log out */}
             <div
                 className="w-full flex items-center px-3 py-4 cursor-pointer"
-                onClick={() => logoutHandler()}
+                onClick={handleLogout}
             >
                 <AiOutlineLogout size={20} className="dark:text-white text-black" />
                 <h5 className="hidden 800px:block pl-2 font-Poppins text-black dark:text-white hover:underline">
-                    Log Out
+                    {isLoading ? "Logging out..." : "Log Out"}
                 </h5>
             </div>
         </div>
     );
 };
+
 export default SidebarProfile;
